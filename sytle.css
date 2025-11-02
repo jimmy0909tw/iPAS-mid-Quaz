@@ -82,6 +82,10 @@ button:hover {
   gap: 0.8em;
 }
 
+.options div {
+  margin-bottom: 0.6em;
+}
+
 .options label {
   display: flex;
   align-items: center;
@@ -112,9 +116,7 @@ button:hover {
   text-align: center;
 }
 
-.button-area button,
-#next-btn,
-#finish-btn {
+.button-area button {
   font-size: 1.2em;
   padding: 0.6em 1.4em;
   border-radius: 10px;
@@ -125,9 +127,7 @@ button:hover {
   transition: background 0.2s;
 }
 
-.button-area button:hover,
-#next-btn:hover,
-#finish-btn:hover {
+.button-area button:hover {
   background: var(--primary-dark);
 }
 
