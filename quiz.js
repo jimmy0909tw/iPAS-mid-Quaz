@@ -1,6 +1,7 @@
 let quiz = [];
 let current = 0;
 let allQuestions = [];
+let wrongAnswers = [];
 
 const fileMap = {
   L1: ["L1_1.csv", "L1_2.csv", "L1_3.csv", "L1_A1.csv", "L1_A2.csv", "L1_A3.csv"],
@@ -13,6 +14,9 @@ async function startQuiz() {
   allQuestions = await loadMultipleCSVs(files);
   quiz = pickRandom(allQuestions, 30);
   current = 0;
+  wrongAnswers = [];
+  document.getElementById("result-container").style.display = "none";
+  document.getElementById("quiz-container").style.display = "block";
   renderQuestion();
 }
 
@@ -32,6 +36,7 @@ async function loadCSV(file) {
     const lines = text.trim().split('\n');
     return lines.slice(1).map(parseCSVLine);
   } catch (e) {
+    console.error("❌ 載入失敗：" + file, e);
     alert("❌ 無法載入題庫：" + file);
     return [];
   }
@@ -80,17 +85,57 @@ function showAnswer(q, ans) {
     ? "✔️ 答對了！<br>" + q.explanation
     : `❌ 答錯了！<br>正確答案：${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}<br>${q.explanation}`;
 
+  if (!isCorrect) {
+    wrongAnswers.push({
+      question: q.question,
+      options: q.options,
+      correct: q.answer,
+      explanation: q.explanation
+    });
+  }
+
   const btn = document.createElement('button');
-  btn.innerText = current < quiz.length - 1 ? '下一題' : '重新開始';
+  btn.innerText = current < quiz.length - 1 ? '下一題' : '看成績';
   btn.onclick = () => {
     if (current < quiz.length - 1) {
       current++;
       renderQuestion();
     } else {
-      startQuiz();
+      showResult();
     }
   };
   exp.parentElement.appendChild(btn);
+}
+
+function showResult() {
+  const container = document.getElementById('quiz-container');
+  container.style.display = 'none';
+
+  const result = document.getElementById('result-container');
+  result.style.display = 'block';
+
+  const score = quiz.length - wrongAnswers.length;
+  result.innerHTML = `
+    <div class="score">🎉 成績：${score} / ${quiz.length}</div>
+    <h3>❌ 錯題記錄：</h3>
+    ${wrongAnswers.length === 0 ? '<p>太棒了！你全都答對了！</p>' : wrongAnswers.map((w, i) => `
+      <div class="wrong-list">
+        <div><strong>(${i + 1}) ${w.question}</strong></div>
+        <div>正確答案：${String.fromCharCode(65 + w.correct)}. ${w.options[w.correct]}</div>
+        <div class="explanation">${w.explanation}</div>
+      </div>
+    `).join('')}
+    <div class="button-area">
+      <button onclick="restartQuiz()">再挑戰一次</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  wrongAnswers = [];
+  document.getElementById('result-container').style.display = 'none';
+  document.getElementById('quiz-container').style.display = 'block';
+  startQuiz();
 }
 
 function pickRandom(arr, n) {
