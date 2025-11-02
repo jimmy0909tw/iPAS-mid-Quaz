@@ -1,8 +1,35 @@
-<div class="controls">
-  <label for="level">📂 選擇題庫：</label>
-  <select id="level">
-    <option value="L1">L1 題庫</option>
-    <option value="L3">L3 題庫</option>
-  </select>
-  <button onclick="startQuiz()">🚀 開始測驗</button>
-</div>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iPAS AI 線上題庫</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>📘 iPAS AI 線上題庫</h1>
+    <p class="subtitle">隨機抽題・即時解說・錯題再挑戰</p>
+  </header>
+
+  <section class="controls">
+    <label for="level">📂 選擇題庫：</label>
+    <select id="level">
+      <option value="L1">L1 題庫</option>
+      <option value="L3">L3 題庫</option>
+    </select>
+    <button onclick="startQuiz()">🚀 開始測驗</button>
+  </section>
+
+  <main>
+    <div id="quiz-container"></div>
+    <div id="result-container" style="display:none;"></div>
+  </main>
+
+  <footer>
+    <p>© 2025 iPAS 題庫系統｜由景閔設計與開發</p>
+  </footer>
+
+  <script src="quiz.js"></script>
+</body>
+</html>
