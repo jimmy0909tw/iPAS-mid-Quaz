@@ -3,11 +3,10 @@ const quizContainer = document.getElementById("quizContainer");
 
 startBtn.addEventListener("click", () => {
   const level = document.getElementById("level").value;
-  const difficulty = document.getElementById("difficulty").value;
-  startQuiz(level, difficulty);
+  startQuiz(level);
 });
 
-function startQuiz(level, difficulty) {
+function startQuiz(level) {
   quizContainer.innerHTML = "<p>載入題目中...</p>";
   const folder = ""; // 所有 CSV 都在根目錄
   const files = level === "L1"
@@ -29,10 +28,7 @@ function startQuiz(level, difficulty) {
         allQuestions = allQuestions.concat(cleaned);
         loaded++;
         if (loaded === files.length) {
-          const filtered = difficulty === "all"
-            ? allQuestions
-            : allQuestions.filter(q => q.難度 === difficulty);
-          const selected = shuffle(filtered).slice(0, 30);
+          const selected = shuffle(allQuestions).slice(0, 30);
           displayQuestions(selected);
         }
       }
