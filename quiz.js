@@ -1,11 +1,28 @@
 let quiz = [];
 let current = 0;
+let allQuestions = [];
+
+const fileMap = {
+  L1: ["L1_1.csv", "L1_2.csv", "L1_3.csv", "L1_A1.csv", "L1_A2.csv", "L1_A3.csv"],
+  L3: ["L3_1.csv", "L3_2.csv", "L3_3.csv", "L3_A1.csv", "L3_A2.csv", "L3_A3.csv"]
+};
 
 async function startQuiz() {
-  const questions = await loadCSV("L1_1.csv");
-  quiz = pickRandom(questions, 5); // 測試用只抽 5 題
+  const level = document.getElementById("level").value;
+  const files = fileMap[level];
+  allQuestions = await loadMultipleCSVs(files);
+  quiz = pickRandom(allQuestions, 30);
   current = 0;
   renderQuestion();
+}
+
+async function loadMultipleCSVs(files) {
+  const all = [];
+  for (const file of files) {
+    const questions = await loadCSV(file);
+    all.push(...questions);
+  }
+  return all;
 }
 
 async function loadCSV(file) {
@@ -13,8 +30,7 @@ async function loadCSV(file) {
     const res = await fetch(file);
     const text = await res.text();
     const lines = text.trim().split('\n');
-    const parsed = lines.slice(1).map(parseCSVLine);
-    return parsed;
+    return lines.slice(1).map(parseCSVLine);
   } catch (e) {
     alert("❌ 無法載入題庫：" + file);
     return [];
