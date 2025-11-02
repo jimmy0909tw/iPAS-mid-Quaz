@@ -59,10 +59,12 @@ function renderQuestion() {
     <div class="question">(${current + 1}/${quiz.length}) ${q.question}</div>
     <form id="options-form" class="options">
       ${q.options.map((opt, i) => `
-        <label>
-          <input type="radio" name="option" value="${i}" required>
-          <span>${String.fromCharCode(65 + i)}. ${opt}</span>
-        </label>
+        <div>
+          <label>
+            <input type="radio" name="option" value="${i}" required>
+            ${String.fromCharCode(65 + i)}. ${opt}
+          </label>
+        </div>
       `).join('')}
       <div class="button-area">
         <button type="submit">提交答案</button>
