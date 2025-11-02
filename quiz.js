@@ -1,175 +1,157 @@
-let quiz = [];
-let userAnswers = [];
-let current = 0;
-let allQuestions = [];
-
-const fileMap = {
-  L1: ["L1_1.csv", "L1_2.csv", "L1_3.csv", "L1_A1.csv", "L1_A2.csv", "L1_A3.csv"],
-  L3: ["L3_1.csv", "L3_2.csv", "L3_3.csv", "L3_A1.csv", "L3_A2.csv", "L3_A3.csv"]
-};
-
-async function startQuiz() {
-  const level = document.getElementById("level").value;
-  const files = fileMap[level];
-  allQuestions = await loadMultipleCSVs(files);
-  quiz = pickRandom(allQuestions, 30);
-  userAnswers = Array(quiz.length);
-  current = 0;
-  document.getElementById('result-container').style.display = 'none';
-  document.getElementById('quiz-container').style.display = 'block';
-  renderQuestion();
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --bg: #f9fafb;
+  --text: #222;
+  --card: #ffffff;
+  --shadow: rgba(0, 0, 0, 0.08);
 }
 
-async function loadMultipleCSVs(files) {
-  let all = [];
-  for (const file of files) {
-    try {
-      const res = await fetch(file);
-      const text = await res.text();
-      const lines = text.trim().split('\n');
-      const parsed = lines.slice(1).map(parseCSVLine);
-      all = all.concat(parsed);
-    } catch (e) {
-      console.warn("無法載入檔案：" + file);
-    }
+body {
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.8em;
+  margin: 1em 0;
+  color: var(--primary-dark);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+
+select, button {
+  font-size: 1.2em;
+  padding: 0.6em 1em;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  max-width: 300px;
+  width: 90%;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+#quiz-container, #result-container {
+  max-width: 700px;
+  margin: 0 auto 3em;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px var(--shadow);
+  padding: 2em;
+}
+
+.question {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 1em;
+  line-height: 1.5;
+}
+
+.options label {
+  display: block;
+  margin: 0.8em 0;
+  font-size: 1.1em;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.options input[type="radio"] {
+  margin-right: 0.5em;
+  transform: scale(1.2);
+}
+
+.button-area {
+  margin-top: 2em;
+  text-align: center;
+}
+
+.button-area button,
+#next-btn,
+#finish-btn {
+  font-size: 1.3em;
+  padding: 0.6em 1.6em;
+  margin: 0.5em;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.button-area button:hover,
+#next-btn:hover,
+#finish-btn:hover {
+  background: var(--primary-dark);
+}
+
+.explanation {
+  margin-top: 1.5em;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.score {
+  font-size: 2em;
+  font-weight: bold;
+  color: #15803d;
+  margin-bottom: 1.2em;
+  text-align: center;
+}
+
+.wrong-list {
+  background: #f3f4f6;
+  padding: 1em;
+  border-radius: 8px;
+  margin-bottom: 1em;
+}
+
+.wrong {
+  color: #cf222e;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5em;
   }
-  return all;
-}
 
-function parseCSVLine(line) {
-  const cells = [];
-  let re = /(".*?"|[^",]+)(?=\s*,|\s*$)/g;
-  let match;
-  while ((match = re.exec(line)) !== null) {
-    let cell = match[1];
-    if (cell.startsWith('"') && cell.endsWith('"')) {
-      cell = cell.slice(1, -1);
-    }
-    cells.push(cell);
+  select, button {
+    font-size: 1em;
   }
-  return {
-    id: cells[0],
-    question: cells[2],
-    options: [cells[3], cells[4], cells[5], cells[6]],
-    answer: parseInt(cells[7], 10) - 1,
-    explanation: cells[8]
-  };
-}
 
-function renderQuestion() {
-  const q = quiz[current];
-  const container = document.getElementById('quiz-container');
-  container.innerHTML = `
-    <div class="question">(${current + 1}/${quiz.length}) ${q.question}</div>
-    <form id="options-form" class="options">
-      ${q.options.map((opt, i) => `
-        <label>
-          <input type="radio" name="option" value="${i}" required>
-          ${String.fromCharCode(65 + i)}. ${opt}
-        </label>
-      `).join('')}
-      <div class="button-area">
-        <button type="submit">提交答案</button>
-      </div>
-    </form>
-    <div class="explanation" id="explanation" style="display:none;"></div>
-  `;
-  document.getElementById('options-form').onsubmit = function(e) {
-    e.preventDefault();
-    const ans = parseInt(e.target.option.value, 10);
-    userAnswers[current] = ans;
-    showAnswer(q, ans);
-  };
-}
-
-function showAnswer(q, ans) {
-  const exp = document.getElementById('explanation');
-  const isCorrect = ans === q.answer;
-  exp.style.display = 'block';
-  exp.innerHTML = isCorrect
-    ? "✔️ 答對了！<br>" + q.explanation
-    : `<span class="wrong">❌ 答錯了！</span><br>正確答案：${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}<br>${q.explanation}`;
-
-  if (current < quiz.length - 1) {
-    if (!document.getElementById('next-btn')) {
-      let btn = document.createElement('button');
-      btn.id = 'next-btn';
-      btn.innerText = '下一題';
-      btn.onclick = () => {
-        current++;
-        renderQuestion();
-      };
-      exp.parentElement.appendChild(btn);
-    }
-  } else {
-    if (!document.getElementById('finish-btn')) {
-      let btn = document.createElement('button');
-      btn.id = 'finish-btn';
-      btn.innerText = '看成績';
-      btn.onclick = showResult;
-      exp.parentElement.appendChild(btn);
-    }
+  .question {
+    font-size: 1.1em;
   }
-}
 
-function showResult() {
-  document.getElementById('quiz-container').style.display = 'none';
-  const result = document.getElementById('result-container');
-  let score = 0;
-  let wrongList = [];
-  for (let i = 0; i < quiz.length; i++) {
-    if (userAnswers[i] === quiz[i].answer) score++;
-    else wrongList.push({ q: quiz[i], ans: userAnswers[i] });
+  .options label {
+    font-size: 1em;
   }
-  result.style.display = 'block';
-  result.innerHTML = `
-    <div class="score">你的分數：${score} / ${quiz.length}</div>
-    ${wrongList.length > 0 ? `
-      <div class="wrong-list">
-        <strong>你答錯的題目：</strong>
-        <ol>
-          ${wrongList.map(w => `
-            <li>
-              <div class="question">${w.q.question}</div>
-              <div>你的答案：${w.ans !== undefined ? String.fromCharCode(65 + w.ans) + ". " + (w.q.options[w.ans] || "(未選)") : "(未作答)"}</div>
-              <div>正確答案：${String.fromCharCode(65 + w.q.answer)}. ${w.q.options[w.q.answer]}</div>
-              <div>說明：${w.q.explanation}</div>
-            </li>
-          `).join('')}
-        </ol>
-      </div>
-    ` : `<div>全部答對，太厲害了！</div>`}
-    <div class="button-area">
-      <button onclick="restartQuiz()">再挑戰一次</button>
-    </div>
-  `;
-}
 
-function restartQuiz() {
-  const wrongIds = quiz
-    .map((q, i) => userAnswers[i] !== q.answer ? q.id : null)
-    .filter(id => id !== null);
-
-  const wrongQuestions = allQuestions.filter(q => wrongIds.includes(q.id));
-  const unseen = allQuestions.filter(q => !quiz.map(q => q.id).includes(q.id));
-  const extra = pickRandom(unseen, 30 - wrongQuestions.length);
-  quiz = wrongQuestions.concat(extra);
-  userAnswers = Array(quiz.length);
-  current = 0;
-  document.getElementById('result-container').style.display = 'none';
-  document.getElementById('quiz-container').style.display = 'block';
-  renderQuestion();
-}
-
-function pickRandom(arr, n) {
-  const res = [];
-  const used = new Set();
-  while (res.length < n && res.length < arr.length) {
-    const idx = Math.floor(Math.random() * arr.length);
-    if (!used.has(idx)) {
-      res.push(arr[idx]);
-      used.add(idx);
-    }
+  .button-area button {
+    font-size: 1.1em;
   }
-  return res;
+
+  #quiz-container, #result-container {
+    padding: 1.5em;
+  }
 }
