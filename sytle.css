@@ -1,12 +1,12 @@
 :root {
   --primary: #2563eb;
   --primary-dark: #1e40af;
-  --bg: #f0f4f8;
-  --text: #1f2937;
+  --bg: #f9fafb;
+  --text: #222;
   --card: #ffffff;
   --shadow: rgba(0, 0, 0, 0.08);
-  --correct: #22c55e;
-  --wrong: #ef4444;
+  --correct: #15803d;
+  --wrong: #dc2626;
 }
 
 body {
@@ -19,8 +19,8 @@ body {
 
 h1 {
   text-align: center;
-  font-size: 2em;
-  margin: 1.2em 0 0.5em;
+  font-size: 1.8em;
+  margin: 1em 0 0.4em;
   color: var(--primary-dark);
 }
 
@@ -28,7 +28,6 @@ h1 {
   text-align: center;
   font-size: 1.1em;
   color: #555;
-  margin-top: -0.5em;
   margin-bottom: 1.5em;
 }
 
@@ -37,12 +36,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 1em;
-  margin: 2em auto;
-  background: var(--card);
-  padding: 1.5em;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px var(--shadow);
-  max-width: 500px;
+  margin-bottom: 2em;
 }
 
 select, button {
@@ -67,19 +61,19 @@ button:hover {
 }
 
 #quiz-container, #result-container {
-  max-width: 720px;
+  max-width: 700px;
   margin: 0 auto 3em;
   background: var(--card);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px var(--shadow);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px var(--shadow);
   padding: 2em;
 }
 
 .question {
-  font-size: 1.3em;
+  font-size: 1.2em;
   font-weight: bold;
-  margin-bottom: 1.2em;
-  line-height: 1.6;
+  margin-bottom: 1em;
+  line-height: 1.5;
 }
 
 .options {
@@ -95,10 +89,12 @@ button:hover {
   font-size: 1.1em;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s;
+  display: block;
+  border: 1px solid #ccc;
 }
 
 .options label:hover {
-  background: #cbd5e1;
+  background: #dbeafe;
   transform: scale(1.02);
 }
 
@@ -115,12 +111,11 @@ button:hover {
 .button-area button,
 #next-btn,
 #finish-btn {
-  font-size: 1.3em;
-  padding: 0.6em 1.6em;
-  margin: 0.5em;
-  border-radius: 12px;
+  font-size: 1.2em;
+  padding: 0.6em 1.4em;
+  border-radius: 10px;
   background: var(--primary);
-  color: #fff;
+  color: white;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
@@ -134,22 +129,16 @@ button:hover {
 
 .explanation {
   margin-top: 1.5em;
+  padding: 1em;
+  border-radius: 8px;
+  background: #f9fafb;
+  border-left: 4px solid var(--primary);
   font-size: 1.1em;
   line-height: 1.6;
 }
 
-.explanation .wrong {
-  color: var(--wrong);
-  font-weight: bold;
-}
-
-.explanation .correct {
-  color: var(--correct);
-  font-weight: bold;
-}
-
 .score {
-  font-size: 2em;
+  font-size: 2.4em;
   font-weight: bold;
   color: var(--correct);
   margin-bottom: 1.2em;
@@ -159,13 +148,14 @@ button:hover {
 .wrong-list {
   background: #f3f4f6;
   padding: 1em;
-  border-radius: 8px;
-  margin-bottom: 1em;
+  border-radius: 12px;
+  margin-bottom: 1.5em;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.wrong {
+.wrong-list strong {
+  font-size: 1.1em;
   color: var(--wrong);
-  font-weight: bold;
 }
 
 footer {
@@ -178,7 +168,7 @@ footer {
 
 @media (max-width: 600px) {
   h1 {
-    font-size: 1.6em;
+    font-size: 1.5em;
   }
 
   .subtitle {
@@ -195,10 +185,15 @@ footer {
 
   .options label {
     font-size: 1em;
+    padding: 0.6em 0.8em;
   }
 
   .button-area button {
-    font-size: 1.1em;
+    font-size: 1em;
+  }
+
+  .score {
+    font-size: 2em;
   }
 
   #quiz-container, #result-container {
