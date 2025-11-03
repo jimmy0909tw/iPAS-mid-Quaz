@@ -34,7 +34,11 @@ async function loadCSV(file) {
     const res = await fetch(file);
     const text = await res.text();
     const lines = text.trim().split('\n');
-    return lines.slice(1).map(parseCSVLine);
+    return lines.slice(1).map(line => {
+  const q = parseCSVLine(line);
+  q.source = file; // 加入來源欄位
+  return q;
+});
   } catch (e) {
     console.error("❌ 載入失敗：" + file, e);
     alert("❌ 無法載入題庫：" + file);
@@ -57,6 +61,7 @@ function renderQuestion() {
   const container = document.getElementById('quiz-container');
   container.innerHTML = `
     <div class="question">(${current + 1}/${quiz.length}) ${q.question}</div>
+    <div class="source">📄 來源：${q.source}</div>
     <form id="options-form" class="options">
       ${q.options.map((opt, i) => `
         <div>
