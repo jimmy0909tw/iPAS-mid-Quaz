@@ -34,11 +34,12 @@ async function loadCSV(file) {
     const res = await fetch(file);
     const text = await res.text();
     const lines = text.trim().split('\n');
-    return lines.slice(1).map(line => {
-  const q = parseCSVLine(line);
-  q.source = file; // 加入來源欄位
-  return q;
-});
+    return lines.slice(1).map((line, index) => {
+      const q = parseCSVLine(line);
+      q.source = file;
+      q.sourceIndex = index + 2; // CSV 第一行是標題，index 從 0 開始
+      return q;
+    });
   } catch (e) {
     console.error("❌ 載入失敗：" + file, e);
     alert("❌ 無法載入題庫：" + file);
@@ -60,8 +61,9 @@ function renderQuestion() {
   const q = quiz[current];
   const container = document.getElementById('quiz-container');
   container.innerHTML = `
-    <div class="question">(${current + 1}/${quiz.length}) ${q.question}</div>
-    <div class="source">📄 來源：${q.source}</div>
+    <div class="question">第 ${current + 1} 題（共 ${quiz.length} 題）</div>
+    <div class="question-text">${q.question}</div>
+    <div class="source">📄 來源：${q.source}（第 ${q.sourceIndex} 題）</div>
     <form id="options-form" class="options">
       ${q.options.map((opt, i) => `
         <div>
@@ -97,7 +99,9 @@ function showAnswer(q, ans) {
       question: q.question,
       options: q.options,
       correct: q.answer,
-      explanation: q.explanation
+      explanation: q.explanation,
+      source: q.source,
+      sourceIndex: q.sourceIndex
     });
   }
 
@@ -129,6 +133,7 @@ function showResult() {
       <div class="wrong-list">
         <div><strong>(${i + 1}) ${w.question}</strong></div>
         <div>正確答案：${String.fromCharCode(65 + w.correct)}. ${w.options[w.correct]}</div>
+        <div class="source">📄 來源：${w.source}（第 ${w.sourceIndex} 題）</div>
         <div class="explanation">${w.explanation}</div>
       </div>
     `).join('')}
