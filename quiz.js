@@ -50,6 +50,7 @@ async function loadCSV(file) {
 function parseCSVLine(line) {
   const cells = line.split(',');
   return {
+    id: cells[0], // 題號
     question: cells[2],
     options: [cells[3], cells[4], cells[5], cells[6]],
     answer: parseInt(cells[7], 10) - 1,
@@ -63,7 +64,7 @@ function renderQuestion() {
   container.innerHTML = `
     <div class="question">第 ${current + 1} 題（共 ${quiz.length} 題）</div>
     <div class="question-text">${q.question}</div>
-    <div class="source">📄 來源：${q.source}（第 ${q.sourceIndex} 題）</div>
+    <div class="source">📄 來源：${q.source}（題號：${q.id}）</div>
     <form id="options-form" class="options">
       ${q.options.map((opt, i) => `
         <div>
@@ -97,6 +98,7 @@ function showAnswer(q, ans) {
 
   if (!isCorrect) {
     wrongAnswers.push({
+      id: q.id,
       question: q.question,
       options: q.options,
       correct: q.answer,
@@ -134,7 +136,7 @@ function showResult() {
       <div class="wrong-list">
         <div><strong>(${i + 1}) ${w.question}</strong></div>
         <div>正確答案：${String.fromCharCode(65 + w.correct)}. ${w.options[w.correct]}</div>
-        <div class="source">📄 來源：${w.source}（第 ${w.sourceIndex} 題）</div>
+        <div class="source">📄 來源：${w.source}（題號：${w.id}）</div>
         <div class="explanation">${w.options.map((opt, j) => `${String.fromCharCode(65 + j)}. ${opt}`).join('<br>')}<br><br>${w.explanation}</div>
       </div>
     `).join('')}
